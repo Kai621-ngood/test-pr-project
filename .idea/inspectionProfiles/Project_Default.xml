@@ -1,0 +1,63 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="supervisor" />
+          <option value="fastapi" />
+          <option value="uvicorn" />
+          <option value="pydantic" />
+          <option value="python-multipart" />
+          <option value="aiofiles" />
+          <option value="pytest" />
+          <option value="httpx" />
+          <option value="python-dotenv" />
+          <option value="uvloop" />
+          <option value="gunicorn" />
+          <option value="python-json-logger" />
+          <option value="cryptography" />
+          <option value="DBUtils" />
+          <option value="pymysql" />
+          <option value="redis-py-cluster" />
+          <option value="paddleocr" />
+          <option value="paddlepaddle" />
+          <option value="paddlex" />
+          <option value="numpy" />
+          <option value="opencv-contrib-python" />
+          <option value="pillow" />
+          <option value="awscli" />
+          <option value="boto3" />
+          <option value="prometheus_client" />
+          <option value="aiohttp" />
+          <option value="anthropic" />
+          <option value="atlassian-python-api" />
+          <option value="azure-devops" />
+          <option value="azure-identity" />
+          <option value="certifi" />
+          <option value="dynaconf" />
+          <option value="GitPython" />
+          <option value="google-cloud-aiplatform" />
+          <option value="google-generativeai" />
+          <option value="google-cloud-storage" />
+          <option value="Jinja2" />
+          <option value="litellm" />
+          <option value="loguru" />
+          <option value="msrest" />
+          <option value="openai" />
+          <option value="PyGithub" />
+          <option value="PyYAML" />
+          <option value="python-gitlab" />
+          <option value="retry" />
+          <option value="starlette-context" />
+          <option value="tiktoken" />
+          <option value="ujson" />
+          <option value="tenacity" />
+          <option value="pytest-cov" />
+          <option value="html2text" />
+          <option value="giteapy" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
