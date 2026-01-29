@@ -1,118 +1,118 @@
-# Simple TODO CLI Application
+# 简单待办事项命令行应用
 
-A lightweight command-line TODO list manager written in Python. Perfect for managing your daily tasks right from the terminal.
+一个轻量级的 Python 命令行待办事项管理工具。非常适合直接在终端中管理你的日常任务。
 
-## Features
+## 功能特性
 
-- Add new tasks
-- List all tasks
-- Mark tasks as completed
-- Delete tasks
-- Persistent storage using JSON
-- Simple and intuitive command-line interface
+- 添加新任务
+- 列出所有任务
+- 标记任务为已完成
+- 删除任务
+- 使用 JSON 持久化存储
+- 简单直观的命令行界面
 
-## Installation
+## 安装
 
-1. Clone this repository:
+1. 克隆此仓库：
 ```bash
-git clone <your-repo-url>
+git clone <你的仓库地址>
 cd PythonProject1
 ```
 
-2. Make sure you have Python 3.6 or higher installed:
+2. 确保已安装 Python 3.6 或更高版本：
 ```bash
 python --version
 ```
 
-## Usage
+## 使用方法
 
-### Add a new task
+### 添加新任务
 ```bash
-python main.py add "Buy groceries"
+python main.py add "买菜"
 ```
 
-### List all tasks
+### 列出所有任务
 ```bash
 python main.py list
 ```
 
-### Complete a task
+### 完成任务
 ```bash
 python main.py complete 1
 ```
 
-### Delete a task
+### 删除任务
 ```bash
 python main.py delete 1
 ```
 
-### Show help
+### 显示帮助
 ```bash
 python main.py help
 ```
 
-## Examples
+## 使用示例
 
 ```bash
-# Add some tasks
-python main.py add "Finish project documentation"
-python main.py add "Review pull requests"
-python main.py add "Update dependencies"
+# 添加一些任务
+python main.py add "完成项目文档"
+python main.py add "审查 Pull Request"
+python main.py add "更新依赖包"
 
-# List all tasks
+# 列出所有任务
 python main.py list
 
-# Output:
+# 输出：
 # Your TODO List:
 # ------------------------------------------------------------
-# ○ [1] Finish project documentation
-# ○ [2] Review pull requests
-# ○ [3] Update dependencies
+# ○ [1] 完成项目文档
+# ○ [2] 审查 Pull Request
+# ○ [3] 更新依赖包
 # ------------------------------------------------------------
 
-# Complete a task
+# 完成一个任务
 python main.py complete 1
 
-# Delete a task
+# 删除一个任务
 python main.py delete 3
 ```
 
-## Running Tests
+## 运行测试
 
-Run the unit tests to verify everything works correctly:
+运行单元测试以验证一切正常工作：
 
 ```bash
 python test_1.py
 ```
 
-## Data Storage
+## 数据存储
 
-Tasks are stored in a `todos.json` file in the project directory. This file is created automatically when you add your first task.
+任务存储在项目目录下的 `todos.json` 文件中。当你添加第一个任务时，该文件会自动创建。
 
-## Project Structure
+## 项目结构
 
 ```
 PythonProject1/
-├── main.py           # Main application code
-├── test_1.py         # Unit tests
-├── README.md         # This file
-├── requirements.txt  # Python dependencies (if any)
-├── .gitignore       # Git ignore rules
-└── todos.json       # Data file (created automatically)
+├── main.py           # 主应用程序代码
+├── test_1.py         # 单元测试
+├── README.md         # 本文件
+├── requirements.txt  # Python 依赖（如有）
+├── .gitignore       # Git 忽略规则
+└── todos.json       # 数据文件（自动创建）
 ```
 
-## Contributing
+## 贡献
 
-Feel free to fork this project and submit pull requests with improvements!
+欢迎 Fork 本项目并提交 Pull Request 来改进项目！
 
-## License
+## 许可证
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+本项目采用 MIT 许可证 - 详见 LICENSE 文件。
 
-## Author
+## 作者
 
 Chris Xing
 
-## Version
+## 版本
 
 1.0.0
