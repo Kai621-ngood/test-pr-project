@@ -17,8 +17,13 @@ class TodoManager:
     def load_todos(self):
         """Load todos from JSON file"""
         if os.path.exists(self.data_file):
-            with open(self.data_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
+            try:
+                with open(self.data_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Warning: Could not load {self.data_file}: {e}")
+                print("Starting with empty todo list")
+                return []
         return []
 
     def save_todos(self):
@@ -28,8 +33,10 @@ class TodoManager:
 
     def add_todo(self, task):
         """Add a new todo item"""
+        # Generate ID based on max existing ID to avoid conflicts
+        next_id = max([t['id'] for t in self.todos], default=0) + 1
         todo = {
-            'id': len(self.todos) + 1,
+            'id': next_id,
             'task': task,
             'completed': False,
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -106,7 +113,10 @@ def main():
         if len(sys.argv) < 3:
             print("Error: Please provide a task description")
             return
-        task = ' '.join(sys.argv[2:])
+        task = ' '.join(sys.argv[2:]).strip()
+        if not task:
+            print("Error: Task description cannot be empty")
+            return
         manager.add_todo(task)
 
     elif command == 'list':
