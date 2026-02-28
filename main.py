@@ -8,24 +8,55 @@ import os
 import sys
 from datetime import datetime
 from typing import List, Dict, Optional
-
+import os.path
+import json
 
 class TodoManager:
     def __init__(self, data_file: str = 'todos.json'):
-        self.data_file = data_file
-        self.todos = self.load_todos()
+        # 验证文件名，防止路径遍历
+        if not data_file or '..' in data_file or '/' in data_file or '\\' in data_file:
+            raise ValueError("Invalid data file name")
+
+        # 限制在当前目录或指定安全目录
+        safe_dir = os.path.abspath('.')
+        self.data_file = os.path.join(safe_dir, os.path.basename(data_file))
+
+        # 确保文件在安全目录内
+        if not os.path.abspath(self.data_file).startswith(safe_dir):
+            raise ValueError("File path not allowed")
 
     def load_todos(self) -> List[Dict]:
-        """Load todos from JSON file"""
-        if os.path.exists(self.data_file):
-            try:
-                with open(self.data_file, 'r', encoding='utf-8') as f:
-                    return json.load(f)
-            except (json.JSONDecodeError, IOError) as e:
-                print(f"⚠ Warning: Could not load {self.data_file}: {e}")
-                print("Starting with empty todo list")
-                return []
-        return []
+        """Load todos from JSON file with size and structure validation"""
+        if not os.path.exists(self.data_file):
+            return []
+
+        try:
+            # 检查文件大小，防止过大文件导致内存耗尽
+            file_size = os.path.getsize(self.data_file)
+            if file_size > 10 * 1024 * 1024:  # 10MB 限制
+                raise ValueError("File too large")
+
+            with open(self.data_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+
+            # 验证数据结构
+            if not isinstance(data, list):
+                raise ValueError("Invalid data format: expected list")
+
+            # 验证每个 todo 项的结构
+            for item in data:
+                if not isinstance(item, dict):
+                    raise ValueError("Invalid todo item format")
+                required_fields = ['id', 'task', 'completed']
+                if not all(field in item for field in required_fields):
+                    raise ValueError("Missing required fields in todo item")
+
+            return data
+
+        except (json.JSONDecodeError, IOError, ValueError) as e:
+            print(f"⚠ Warning: Could not load {self.data_file}: {e}")
+            print("Starting with empty todo list")
+            return []
 
     def save_todos(self) -> None:
         """Save todos to JSON file"""
