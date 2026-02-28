@@ -13,49 +13,82 @@ import json
 
 class TodoManager:
     def __init__(self, data_file: str = 'todos.json'):
-        # 验证文件名，防止路径遍历
-        if not data_file or '..' in data_file or '/' in data_file or '\\' in data_file:
+        # 使用更严格的文件名验证
+        if not data_file or not data_file.strip():
             raise ValueError("Invalid data file name")
 
-        # 限制在当前目录或指定安全目录
-        safe_dir = os.path.abspath('.')
-        self.data_file = os.path.join(safe_dir, os.path.basename(data_file))
+        # 规范化路径并检查
+        normalized_file = os.path.normpath(data_file)
+        if (os.path.isabs(normalized_file) or
+                '..' in normalized_file or
+                normalized_file != os.path.basename(normalized_file)):
+            raise ValueError("Invalid data file name")
 
-        # 确保文件在安全目录内
-        if not os.path.abspath(self.data_file).startswith(safe_dir):
+        # 限制文件扩展名
+        allowed_extensions = ['.json', '.txt']
+        if not any(normalized_file.endswith(ext) for ext in allowed_extensions):
+            raise ValueError("File extension not allowed")
+
+        safe_dir = os.path.abspath('.')
+        self.data_file = os.path.join(safe_dir, normalized_file)
+
+        # 最终路径验证
+        if not os.path.abspath(self.data_file).startswith(safe_dir + os.sep):
             raise ValueError("File path not allowed")
 
     def load_todos(self) -> List[Dict]:
-        """Load todos from JSON file with size and structure validation"""
         if not os.path.exists(self.data_file):
             return []
 
         try:
-            # 检查文件大小，防止过大文件导致内存耗尽
             file_size = os.path.getsize(self.data_file)
-            if file_size > 10 * 1024 * 1024:  # 10MB 限制
+            if file_size > 1024 * 1024:  # 降低到1MB
                 raise ValueError("File too large")
 
             with open(self.data_file, 'r', encoding='utf-8') as f:
                 data = json.load(f)
 
-            # 验证数据结构
+            # 严格的数据验证
             if not isinstance(data, list):
                 raise ValueError("Invalid data format: expected list")
 
-            # 验证每个 todo 项的结构
-            for item in data:
-                if not isinstance(item, dict):
-                    raise ValueError("Invalid todo item format")
-                required_fields = ['id', 'task', 'completed']
-                if not all(field in item for field in required_fields):
-                    raise ValueError("Missing required fields in todo item")
+            # 限制数组大小
+            if len(data) > 10000:  # 限制最大任务数
+                raise ValueError("Too many tasks")
 
-            return data
+            validated_todos = []
+            for i, item in enumerate(data):
+                if not isinstance(item, dict):
+                    raise ValueError(f"Invalid todo item format at index {i}")
+
+                # 验证必需字段
+                required_fields = ['id', 'task', 'completed']
+                for field in required_fields:
+                    if field not in item:
+                        raise ValueError(f"Missing field '{field}' in todo item {i}")
+
+                # 验证字段类型和值
+                if not isinstance(item['id'], int) or item['id'] <= 0:
+                    raise ValueError(f"Invalid ID in todo item {i}")
+
+                if not isinstance(item['task'], str) or len(item['task']) > 1000:
+                    raise ValueError(f"Invalid task in todo item {i}")
+
+                if not isinstance(item['completed'], bool):
+                    raise ValueError(f"Invalid completed status in todo item {i}")
+
+                # 验证可选字段
+                if 'priority' in item:
+                    valid_priorities = ['high', 'normal', 'low']
+                    if item['priority'] not in valid_priorities:
+                        item['priority'] = 'normal'  # 默认值
+
+                validated_todos.append(item)
+
+            return validated_todos
 
         except (json.JSONDecodeError, IOError, ValueError) as e:
             print(f"⚠ Warning: Could not load {self.data_file}: {e}")
-            print("Starting with empty todo list")
             return []
 
     def save_todos(self) -> None:
