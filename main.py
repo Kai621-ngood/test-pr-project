@@ -13,27 +13,31 @@ import json
 
 class TodoManager:
     def __init__(self, data_file: str = 'todos.json'):
-        # 使用更严格的文件名验证
+        # 基础验证
         if not data_file or not data_file.strip():
             raise ValueError("Invalid data file name")
 
-        # 规范化路径并检查
-        normalized_file = os.path.normpath(data_file)
-        if (os.path.isabs(normalized_file) or
-                '..' in normalized_file or
-                normalized_file != os.path.basename(normalized_file)):
-            raise ValueError("Invalid data file name")
+        # 严格的文件名验证 - 只允许字母数字和基本符号
+        import re
+        if not re.match(r'^[a-zA-Z0-9._-]+$', data_file):
+            raise ValueError("Invalid characters in filename")
+
+        # 禁止路径分隔符
+        if os.sep in data_file or '/' in data_file or '\\' in data_file:
+            raise ValueError("Path separators not allowed")
 
         # 限制文件扩展名
         allowed_extensions = ['.json', '.txt']
-        if not any(normalized_file.endswith(ext) for ext in allowed_extensions):
+        if not any(data_file.endswith(ext) for ext in allowed_extensions):
             raise ValueError("File extension not allowed")
 
+        # 构造安全路径
         safe_dir = os.path.abspath('.')
-        self.data_file = os.path.join(safe_dir, normalized_file)
+        self.data_file = os.path.join(safe_dir, data_file)
 
-        # 最终路径验证
-        if not os.path.abspath(self.data_file).startswith(safe_dir + os.sep):
+        # 解析符号链接后再次验证
+        real_path = os.path.realpath(self.data_file)
+        if not real_path.startswith(os.path.realpath(safe_dir) + os.sep):
             raise ValueError("File path not allowed")
 
     def load_todos(self) -> List[Dict]:
