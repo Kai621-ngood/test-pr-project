@@ -10,6 +10,8 @@ from datetime import datetime
 from typing import List, Dict, Optional
 import os.path
 import json
+import tempfile
+import shutil
 
 class TodoManager:
     def __init__(self, data_file: str = 'todos.json'):
@@ -36,8 +38,8 @@ class TodoManager:
         self.data_file = os.path.join(safe_dir, data_file)
 
         # 解析符号链接后再次验证
-        real_path = os.path.realpath(self.data_file)
-        if not real_path.startswith(os.path.realpath(safe_dir) + os.sep):
+        safe_dir_real = os.path.realpath(safe_dir)
+        if not (real_path.startswith(safe_dir_real + os.sep) or real_path == safe_dir_real):
             raise ValueError("File path not allowed")
 
     def load_todos(self) -> List[Dict]:
@@ -49,8 +51,12 @@ class TodoManager:
             if file_size > 1024 * 1024:  # 降低到1MB
                 raise ValueError("File too large")
 
+            MAX_JSON_SIZE = 1024 * 1024  # 1MB
             with open(self.data_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
+                content = f.read(MAX_JSON_SIZE + 1)
+                if len(content) > MAX_JSON_SIZE:
+                    raise ValueError("JSON file too large")
+                data = json.loads(content)
 
             # 严格的数据验证
             if not isinstance(data, list):
@@ -96,11 +102,18 @@ class TodoManager:
             return []
 
     def save_todos(self) -> None:
-        """Save todos to JSON file"""
         try:
-            with open(self.data_file, 'w', encoding='utf-8') as f:
+            # 原子写入：先写临时文件，再重命名
+            temp_file = self.data_file + '.tmp'
+            with open(temp_file, 'w', encoding='utf-8') as f:
                 json.dump(self.todos, f, ensure_ascii=False, indent=2)
+
+            # 原子操作：重命名
+            shutil.move(temp_file, self.data_file)
         except IOError as e:
+            # 清理临时文件
+            if os.path.exists(temp_file):
+                os.remove(temp_file)
             print(f"✗ Error saving todos: {e}")
 
     def add_todo(self, task: str, priority: str = 'normal') -> None:
